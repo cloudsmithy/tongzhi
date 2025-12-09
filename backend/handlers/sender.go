@@ -23,13 +23,13 @@ type SendResponse struct {
 }
 
 // SendMessages sends messages to recipients and returns the response
-func SendMessages(wechatSvc *services.WeChatService, recipients []models.Recipient, title, content string) SendResponse {
+func SendMessages(wechatSvc *services.WeChatService, recipients []models.Recipient, templateID string, keywords map[string]string) SendResponse {
 	var openIDs []string
 	for _, r := range recipients {
 		openIDs = append(openIDs, r.OpenID)
 	}
 
-	results, _ := wechatSvc.SendMessageToMultiple(openIDs, title, content)
+	results, _ := wechatSvc.SendMessageToMultiple(openIDs, templateID, keywords)
 
 	var sendResults []SendResult
 	successCount, failureCount := 0, 0

@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { generateWebhookToken } from '../services/api';
+import { MessageTemplate } from '../types';
 
 interface Props {
   token: string;
+  templates: MessageTemplate[];
   onTokenChange: (token: string) => void;
   onSuccess: (msg: string) => void;
   onError: (msg: string) => void;
 }
 
-export function WebhookConfig({ token, onTokenChange, onSuccess, onError }: Props) {
+export function WebhookConfig({ token, templates, onTokenChange, onSuccess, onError }: Props) {
   const [generating, setGenerating] = useState(false);
+  
+  // 获取示例用的 templateKey
+  const exampleTemplateKey = templates.length > 0 ? templates[0].key : '订单通知';
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -52,23 +57,33 @@ export function WebhookConfig({ token, onTokenChange, onSuccess, onError }: Prop
           </div>
         </div>
         <div className="webhook-usage">
-          <p><strong>使用方法：</strong></p>
-          <pre>{`POST http://localhost:8080/webhook/send
-Headers:
-  Authorization: Bearer <token>
-  Content-Type: application/json
-Body:
-{
-  "title": "消息标题",
-  "content": "消息内容",
-  "recipientIds": [1, 2]  // 可选，不传则发送给所有接收者
-}
-
-curl 示例：
-curl -X POST http://localhost:8080/webhook/send \\
+          <p><strong>请求格式：</strong></p>
+          <textarea
+            className="form-input webhook-example"
+            readOnly
+            value={`{
+  "templateKey": "${exampleTemplateKey}",
+  "keywords": {
+    "first": "您有一条新消息",
+    "keyword1": "订单编号: 2024120901",
+    "keyword2": "金额: ¥99.00",
+    "keyword3": "时间: 2024-12-09 15:30",
+    "remark": "点击查看详情"
+  },
+  "recipientIds": [1]
+}`}
+          />
+          <p style={{ marginTop: '15px' }}><strong>curl 示例：</strong></p>
+          <pre>{`curl -X POST http://localhost:8080/webhook/send \\
   -H "Authorization: Bearer ${token || '<your-token>'}" \\
   -H "Content-Type: application/json" \\
-  -d '{"title":"测试标题","content":"测试内容"}'`}</pre>
+  -d '{
+    "templateKey": "${exampleTemplateKey}",
+    "keywords": {
+      "first": "您有一条新消息",
+      "keyword1": "订单编号: 2024120901"
+    }
+  }'`}</pre>
         </div>
       </div>
     </div>

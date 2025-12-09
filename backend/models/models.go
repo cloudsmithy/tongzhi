@@ -15,9 +15,17 @@ type Recipient struct {
 
 // SendMessageRequest represents a request to send a message
 type SendMessageRequest struct {
-	Title        string  `json:"title"`
-	Content      string  `json:"content"`
-	RecipientIDs []int64 `json:"recipientIds"`
+	TemplateKey  string            `json:"templateKey"`  // 模板标识（用于选择模板）
+	Keywords     map[string]string `json:"keywords"`     // keyword0, keyword1, keyword2...
+	RecipientIDs []int64           `json:"recipientIds"`
+}
+
+// MessageTemplate represents a WeChat message template
+type MessageTemplate struct {
+	ID         int64  `json:"id"`
+	Key        string `json:"key"`        // 模板标识（如 "订单通知"）
+	TemplateID string `json:"templateId"` // 微信模板ID
+	Name       string `json:"name"`       // 模板名称
 }
 
 // WeChatTemplateMessage represents a WeChat template message

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Recipient, WeChatConfig } from '../types';
-import { getRecipients, getWeChatConfig, getWebhookToken } from '../services/api';
-import { WebhookConfig } from '../components/WebhookConfig';
+import { Recipient, WeChatConfig, MessageTemplate } from '../types';
+import { getRecipients, getWeChatConfig, getTemplates } from '../services/api';
 import { WeChatConfig as WeChatConfigComponent } from '../components/WeChatConfig';
 import { RecipientManager } from '../components/RecipientManager';
+import { TemplateManager } from '../components/TemplateManager';
 
 export function Settings() {
   const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [wechatConfig, setWechatConfig] = useState<WeChatConfig>({ appId: '', appSecret: '', templateId: '' });
-  const [webhookToken, setWebhookToken] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -20,14 +20,14 @@ export function Settings() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [recipientsData, configData, tokenData] = await Promise.all([
+      const [recipientsData, configData, templatesData] = await Promise.all([
         getRecipients(),
         getWeChatConfig(),
-        getWebhookToken(),
+        getTemplates(),
       ]);
       setRecipients(recipientsData);
       setWechatConfig(configData);
-      setWebhookToken(tokenData.token || '');
+      setTemplates(templatesData);
     } catch (err) {
       setError(err instanceof Error ? err.message : '加载数据失败');
     } finally {
@@ -41,6 +41,15 @@ export function Settings() {
       setRecipients(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : '加载接收者失败');
+    }
+  };
+
+  const loadTemplates = async () => {
+    try {
+      const data = await getTemplates();
+      setTemplates(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载模板失败');
     }
   };
 
@@ -63,13 +72,6 @@ export function Settings() {
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
       
-      <WebhookConfig 
-        token={webhookToken} 
-        onTokenChange={setWebhookToken}
-        onSuccess={showSuccess}
-        onError={showError}
-      />
-      
       <WeChatConfigComponent
         config={wechatConfig}
         onConfigChange={setWechatConfig}
@@ -80,6 +82,12 @@ export function Settings() {
       <RecipientManager
         recipients={recipients}
         onReload={loadRecipients}
+        onError={showError}
+      />
+      
+      <TemplateManager
+        templates={templates}
+        onReload={loadTemplates}
         onError={showError}
       />
     </div>

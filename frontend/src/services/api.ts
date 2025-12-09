@@ -9,6 +9,7 @@ import {
   AuthStatus,
   WeChatConfig,
   WebhookTokenResponse,
+  MessageTemplate,
 } from '../types';
 
 // API base URL - can be configured via environment variable
@@ -193,6 +194,43 @@ export async function generateWebhookToken(): Promise<string> {
     throw new Error(response.data.error || 'Failed to generate webhook token');
   }
   return response.data.data?.token || '';
+}
+
+// ============ Template API ============
+
+/**
+ * Get all templates
+ * GET /api/templates
+ */
+export async function getTemplates(): Promise<MessageTemplate[]> {
+  const response = await apiClient.get<ApiResponse<MessageTemplate[]>>('/templates');
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Failed to fetch templates');
+  }
+  return response.data.data || [];
+}
+
+/**
+ * Create a new template
+ * POST /api/templates
+ */
+export async function createTemplate(data: { key: string; templateId: string; name: string }): Promise<MessageTemplate> {
+  const response = await apiClient.post<ApiResponse<MessageTemplate>>('/templates', data);
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Failed to create template');
+  }
+  return response.data.data!;
+}
+
+/**
+ * Delete a template
+ * DELETE /api/templates/:id
+ */
+export async function deleteTemplate(id: number): Promise<void> {
+  const response = await apiClient.delete<ApiResponse<void>>(`/templates/${id}`);
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Failed to delete template');
+  }
 }
 
 // Export the axios instances for advanced usage

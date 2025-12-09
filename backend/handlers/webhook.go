@@ -26,9 +26,9 @@ func NewWebhookHandler(repo *repository.SQLiteRepository, wechatSvc *services.We
 
 // WebhookSendRequest represents the webhook send request
 type WebhookSendRequest struct {
-	Title        string  `json:"title" binding:"required"`
-	Content      string  `json:"content" binding:"required"`
-	RecipientIDs []int64 `json:"recipientIds"` // Optional, if empty sends to all recipients
+	TemplateKey  string            `json:"templateKey" binding:"required"`
+	Keywords     map[string]string `json:"keywords" binding:"required"`
+	RecipientIDs []int64           `json:"recipientIds"` // Optional, if empty sends to all recipients
 }
 
 // Send handles webhook message sending
@@ -73,22 +73,30 @@ func (h *WebhookHandler) Send(c *gin.Context) {
 	var req WebhookSendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, models.ApiResponse{
-			Success: false, Error: "Invalid request: title and content are required", Code: "INVALID_REQUEST",
+			Success: false, Error: "Invalid request: templateKey and keywords are required", Code: "INVALID_REQUEST",
 		})
 		return
 	}
 
-	// Validate message content
-	if strings.TrimSpace(req.Title) == "" || strings.TrimSpace(req.Content) == "" {
+	// Validate request
+	if strings.TrimSpace(req.TemplateKey) == "" || len(req.Keywords) == 0 {
 		c.JSON(http.StatusBadRequest, models.ApiResponse{
-			Success: false, Error: "Title and content cannot be empty", Code: "VALIDATION_ERROR",
+			Success: false, Error: "TemplateKey and keywords cannot be empty", Code: "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	// Get template by key
+	template, err := h.repo.GetTemplateByKey(req.TemplateKey)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ApiResponse{
+			Success: false, Error: "Template not found", Code: "TEMPLATE_NOT_FOUND",
 		})
 		return
 	}
 
 	// Get recipients
 	var recipients []models.Recipient
-	var err error
 
 	if len(req.RecipientIDs) > 0 {
 		// Get specific recipients by IDs
@@ -118,7 +126,7 @@ func (h *WebhookHandler) Send(c *gin.Context) {
 	}
 
 	// Send messages using shared logic
-	response := SendMessages(h.wechatSvc, recipients, req.Title, req.Content)
+	response := SendMessages(h.wechatSvc, recipients, template.TemplateID, req.Keywords)
 
 	c.JSON(http.StatusOK, models.ApiResponse{
 		Success: true,

@@ -46,8 +46,8 @@ func NewWeChatServiceWithClient(tokenManager *TokenManager, templateID string, c
 	}
 }
 
-// SendMessage sends a template message to a recipient
-func (s *WeChatService) SendMessage(openID, title, content string) (*models.WeChatAPIResponse, error) {
+// SendMessage sends a template message to a recipient with dynamic keywords
+func (s *WeChatService) SendMessage(openID, templateID string, keywords map[string]string) (*models.WeChatAPIResponse, error) {
 	// Get access token (will auto-refresh if expired)
 	token, err := s.tokenManager.GetAccessToken()
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *WeChatService) SendMessage(openID, title, content string) (*models.WeCh
 	}
 
 	// Format the message
-	msg := s.FormatTemplateMessage(openID, title, content)
+	msg := s.FormatTemplateMessage(openID, templateID, keywords)
 
 	// Serialize to JSON
 	jsonData, err := json.Marshal(msg)
@@ -94,7 +94,7 @@ func (s *WeChatService) SendMessage(openID, title, content string) (*models.WeCh
 }
 
 // SendMessageToMultiple sends a template message to multiple recipients concurrently
-func (s *WeChatService) SendMessageToMultiple(openIDs []string, title, content string) (map[string]*models.WeChatAPIResponse, error) {
+func (s *WeChatService) SendMessageToMultiple(openIDs []string, templateID string, keywords map[string]string) (map[string]*models.WeChatAPIResponse, error) {
 	results := make(map[string]*models.WeChatAPIResponse)
 	resultChan := make(chan struct {
 		openID string
@@ -104,7 +104,7 @@ func (s *WeChatService) SendMessageToMultiple(openIDs []string, title, content s
 	// Send messages concurrently
 	for _, openID := range openIDs {
 		go func(id string) {
-			resp, err := s.SendMessage(id, title, content)
+			resp, err := s.SendMessage(id, templateID, keywords)
 			if err != nil {
 				resultChan <- struct {
 					openID string
@@ -128,27 +128,20 @@ func (s *WeChatService) SendMessageToMultiple(openIDs []string, title, content s
 	return results, nil
 }
 
-// FormatTemplateMessage formats a message for WeChat template API
-// This function ensures all required fields are present and properly formatted
-// Uses common WeChat template fields: first (header), keyword1 (title), keyword2 (content), remark (footer)
-func (s *WeChatService) FormatTemplateMessage(openID, title, content string) *models.WeChatTemplateMessage {
+// FormatTemplateMessage formats a message for WeChat template API with dynamic keywords
+// keywords map: {"first": "头部", "keyword1": "值1", "keyword2": "值2", "remark": "备注"}
+func (s *WeChatService) FormatTemplateMessage(openID, templateID string, keywords map[string]string) *models.WeChatTemplateMessage {
+	data := make(map[string]interface{})
+	for key, value := range keywords {
+		data[key] = map[string]string{
+			"value": value,
+		}
+	}
+
 	return &models.WeChatTemplateMessage{
 		ToUser:     openID,
-		TemplateID: s.templateID,
-		Data: map[string]interface{}{
-			"first": map[string]string{
-				"value": "您有一条新消息",
-			},
-			"keyword1": map[string]string{
-				"value": title,
-			},
-			"keyword2": map[string]string{
-				"value": content,
-			},
-			"remark": map[string]string{
-				"value": "点击查看详情",
-			},
-		},
+		TemplateID: templateID,
+		Data:       data,
 	}
 }
 

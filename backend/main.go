@@ -44,6 +44,7 @@ func main() {
 	messageHandler := handlers.NewMessageHandler(repo, wechatService)
 	configHandler := handlers.NewConfigHandler(repo, tokenManager, wechatService)
 	webhookHandler := handlers.NewWebhookHandler(repo, wechatService)
+	templateHandler := handlers.NewTemplateHandler(repo)
 
 	// Setup router
 	r := gin.Default()
@@ -75,6 +76,9 @@ func main() {
 		api.POST("/config/wechat", configHandler.SaveWeChatConfig)
 		api.GET("/webhook/token", webhookHandler.GetToken)
 		api.POST("/webhook/token", webhookHandler.GenerateToken)
+		api.GET("/templates", templateHandler.List)
+		api.POST("/templates", templateHandler.Create)
+		api.DELETE("/templates/:id", templateHandler.Delete)
 	}
 
 	// Public webhook endpoint (uses its own token auth + rate limiting)

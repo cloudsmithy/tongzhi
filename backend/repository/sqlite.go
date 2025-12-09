@@ -65,7 +65,18 @@ func (r *SQLiteRepository) initTables() error {
 		key TEXT PRIMARY KEY,
 		value TEXT NOT NULL
 	)`
-	_, err := r.db.Exec(configQuery)
+	if _, err := r.db.Exec(configQuery); err != nil {
+		return err
+	}
+
+	templatesQuery := `
+	CREATE TABLE IF NOT EXISTS templates (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		key TEXT UNIQUE NOT NULL,
+		template_id TEXT NOT NULL,
+		name TEXT NOT NULL
+	)`
+	_, err := r.db.Exec(templatesQuery)
 	return err
 }
 
@@ -319,4 +330,65 @@ func (r *SQLiteRepository) GetByIDs(ids []int64) ([]models.Recipient, error) {
 		recipients = []models.Recipient{}
 	}
 	return recipients, rows.Err()
+}
+
+
+// CreateTemplate creates a new message template
+func (r *SQLiteRepository) CreateTemplate(template *models.MessageTemplate) error {
+	result, err := r.db.Exec(
+		"INSERT INTO templates (key, template_id, name) VALUES (?, ?, ?)",
+		template.Key, template.TemplateID, template.Name,
+	)
+	if err != nil {
+		return err
+	}
+	id, _ := result.LastInsertId()
+	template.ID = id
+	return nil
+}
+
+// GetAllTemplates retrieves all templates
+func (r *SQLiteRepository) GetAllTemplates() ([]models.MessageTemplate, error) {
+	rows, err := r.db.Query("SELECT id, key, template_id, name FROM templates ORDER BY id")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var templates []models.MessageTemplate
+	for rows.Next() {
+		var t models.MessageTemplate
+		if err := rows.Scan(&t.ID, &t.Key, &t.TemplateID, &t.Name); err != nil {
+			return nil, err
+		}
+		templates = append(templates, t)
+	}
+	if templates == nil {
+		templates = []models.MessageTemplate{}
+	}
+	return templates, rows.Err()
+}
+
+// GetTemplateByKey retrieves a template by key
+func (r *SQLiteRepository) GetTemplateByKey(key string) (*models.MessageTemplate, error) {
+	var t models.MessageTemplate
+	err := r.db.QueryRow("SELECT id, key, template_id, name FROM templates WHERE key = ?", key).
+		Scan(&t.ID, &t.Key, &t.TemplateID, &t.Name)
+	if err == sql.ErrNoRows {
+		return nil, ErrNotFound
+	}
+	return &t, err
+}
+
+// DeleteTemplate deletes a template by ID
+func (r *SQLiteRepository) DeleteTemplate(id int64) error {
+	result, err := r.db.Exec("DELETE FROM templates WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }

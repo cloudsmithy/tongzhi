@@ -21,6 +21,7 @@ export function Layout() {
         <div className="nav-links">
           <Link to="/" className="nav-link">主页</Link>
           <Link to="/settings" className="nav-link">设置</Link>
+          <Link to="/webhook" className="nav-link">Webhook</Link>
           <button onClick={handleLogout} className="nav-link logout-btn">
             登出
           </button>

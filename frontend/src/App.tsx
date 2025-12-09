@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
 import { Home } from './pages/Home';
 import { Settings } from './pages/Settings';
+import { Webhook } from './pages/Webhook';
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="webhook" element={<Webhook />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

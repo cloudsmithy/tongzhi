@@ -9,9 +9,9 @@ import (
 
 // Validation errors
 var (
-	ErrEmptyRecipients = errors.New("recipient list cannot be empty")
-	ErrEmptyTitle      = errors.New("title cannot be empty or whitespace only")
-	ErrEmptyContent    = errors.New("content cannot be empty or whitespace only")
+	ErrEmptyRecipients   = errors.New("recipient list cannot be empty")
+	ErrEmptyTemplateKey  = errors.New("template key cannot be empty")
+	ErrEmptyKeywords     = errors.New("keywords cannot be empty")
 )
 
 // ValidationResult contains the result of message validation
@@ -32,16 +32,16 @@ func ValidateMessage(req *models.SendMessageRequest) ValidationResult {
 		result.Errors = append(result.Errors, ErrEmptyRecipients)
 	}
 
-	// Validate title is not empty or whitespace only
-	if strings.TrimSpace(req.Title) == "" {
+	// Validate template key is not empty
+	if strings.TrimSpace(req.TemplateKey) == "" {
 		result.Valid = false
-		result.Errors = append(result.Errors, ErrEmptyTitle)
+		result.Errors = append(result.Errors, ErrEmptyTemplateKey)
 	}
 
-	// Validate content is not empty or whitespace only
-	if strings.TrimSpace(req.Content) == "" {
+	// Validate keywords is not empty
+	if len(req.Keywords) == 0 {
 		result.Valid = false
-		result.Errors = append(result.Errors, ErrEmptyContent)
+		result.Errors = append(result.Errors, ErrEmptyKeywords)
 	}
 
 	return result

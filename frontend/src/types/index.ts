@@ -25,8 +25,8 @@ export interface UpdateRecipientRequest {
 
 // Request to send a message
 export interface SendMessageRequest {
-  title: string;
-  content: string;
+  templateKey: string;           // 模板标识
+  keywords: Record<string, string>; // keyword0, keyword1...
   recipientIds: number[];
 }
 
@@ -75,6 +75,14 @@ export interface WeChatConfig {
   appId: string;
   appSecret: string;
   templateId: string;
+}
+
+// Message template
+export interface MessageTemplate {
+  id: number;
+  key: string;       // 模板标识
+  templateId: string; // 微信模板ID
+  name: string;       // 模板名称
 }
 
 // Webhook token response

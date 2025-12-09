@@ -48,6 +48,25 @@ func (h *MessageHandler) Send(c *gin.Context) {
 		return
 	}
 
+	// Get template by key
+	template, err := h.repo.GetTemplateByKey(req.TemplateKey)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusBadRequest, models.ApiResponse{
+				Success: false,
+				Error:   "Template not found",
+				Code:    "TEMPLATE_NOT_FOUND",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, models.ApiResponse{
+			Success: false,
+			Error:   "Failed to retrieve template",
+			Code:    "DATABASE_ERROR",
+		})
+		return
+	}
+
 	// Fetch recipients from database
 	var recipients []models.Recipient
 	for _, id := range req.RecipientIDs {
@@ -72,7 +91,7 @@ func (h *MessageHandler) Send(c *gin.Context) {
 	}
 
 	// Send messages using shared logic
-	response := SendMessages(h.wechatService, recipients, req.Title, req.Content)
+	response := SendMessages(h.wechatService, recipients, template.TemplateID, req.Keywords)
 
 	// Determine response status
 	if response.TotalFailed == 0 {
