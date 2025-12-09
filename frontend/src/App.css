@@ -1,0 +1,410 @@
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  background-color: #07c160;
+  color: white;
+  padding: 0 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-brand {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Login Page */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.login-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.login-subtitle {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.login-btn {
+  background-color: #07c160;
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-btn:hover {
+  background-color: #06ad56;
+}
+
+.error-message {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Page Common */
+.page-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #07c160;
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #07c160;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #06ad56;
+}
+
+.btn-primary:disabled {
+  background-color: #b7eb8f;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-danger {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #ff7875;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Recipients Selection */
+.recipients-section {
+  margin-bottom: 20px;
+}
+
+.recipients-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.recipients-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.recipients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.recipient-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recipient-checkbox:hover {
+  background-color: #f5f5f5;
+}
+
+.recipient-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.recipient-name {
+  font-weight: 500;
+}
+
+.recipient-openid {
+  color: #999;
+  font-size: 12px;
+}
+
+/* Send Result */
+.send-result {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.send-result.success {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.send-result.error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+.result-summary {
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.result-details {
+  font-size: 14px;
+}
+
+.result-item {
+  padding: 4px 0;
+}
+
+.result-item.failed {
+  color: #ff4d4f;
+}
+
+/* Settings Page */
+.settings-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.recipient-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recipient-table th,
+.recipient-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.recipient-table th {
+  background-color: #fafafa;
+  font-weight: 500;
+}
+
+.recipient-table tr:hover {
+  background-color: #fafafa;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.add-form {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.add-form .form-group {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+
+/* Webhook Section */
+.webhook-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.input-with-button .form-input {
+  flex: 1;
+  background-color: #f5f5f5;
+}
+
+.webhook-usage {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.webhook-usage p {
+  margin: 0 0 10px 0;
+}
+
+.webhook-usage pre {
+  margin: 0;
+  padding: 10px;
+  background-color: #282c34;
+  color: #abb2bf;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
