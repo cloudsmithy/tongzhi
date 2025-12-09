@@ -59,6 +59,11 @@ func main() {
 	r.GET("/auth/callback", authHandler.Callback)
 	r.POST("/auth/logout", authHandler.Logout)
 
+	// Health check endpoint
+	r.GET("/api/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
+
 	// Redirect root to frontend (for development)
 	r.GET("/", func(c *gin.Context) {
 		c.Redirect(302, "http://localhost:5173")
