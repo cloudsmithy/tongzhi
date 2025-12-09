@@ -5,11 +5,11 @@
 ## 功能特性
 
 - 🔔 微信模板消息推送
-- � 多模板管理理（支持多个微信模板）
-- � 动e态 keyword 字段（first, keyword1, keyword2...）
-- �  多接收者管理
+- 📋 多模板管理（支持多个微信模板）
+- 🔤 动态 keyword 字段（first, keyword1, keyword2...）
+- 👥 多接收者管理
 - 🔗 Webhook API 支持
-- � Token 认证
+- 🔑 Token 认证
 - ⚡ 并发消息发送
 - 🛡️ 请求频率限制
 
@@ -61,9 +61,12 @@ npm run dev
 1. 访问 `http://localhost:5173`
 2. 在设置页面：
    - 配置微信测试号信息（AppID、AppSecret）
-   - 添加消息模板（模板标识 + 微信模板ID）
+   - 添加消息模板（模板名称 + 微信模板ID）
    - 添加接收者（需要用户关注测试号获取 OpenID）
-3. 在首页：
+3. 在 Webhook 页面：
+   - 生成 API Token
+   - 查看调用示例
+4. 在首页：
    - 选择模板
    - 填写模板字段（first, keyword1, keyword2...）
    - 选择接收者发送
@@ -71,26 +74,25 @@ npm run dev
 ### Webhook API
 
 ```bash
-# 生成 Token（在设置页面操作）
-
 # 发送消息
-curl -X POST http://localhost:8080/webhook/send \
+curl -X POST http://localhost:5173/api/webhook/send \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "templateKey": "订单通知",
+    "templateKey": "测试",
     "keywords": {
-      "first": "您有一条新订单",
-      "keyword1": "订单号123456",
-      "keyword2": "￥100.00",
-      "remark": "感谢您的支持"
+      "first": "您有一条新消息",
+      "keyword1": "订单编号: 2024120901",
+      "keyword2": "金额: ¥99.00",
+      "keyword3": "时间: 2024-12-09 15:30",
+      "remark": "点击查看详情"
     },
-    "recipientIds": [1, 2]
+    "recipientIds": [1]
   }'
 ```
 
 参数说明：
-- `templateKey` - 模板标识（必填，在设置页面添加的模板标识）
+- `templateKey` - 模板名称（必填，在设置页面添加的模板名称）
 - `keywords` - 模板字段（必填，key-value 格式，对应微信模板的字段）
 - `recipientIds` - 接收者 ID 列表（可选，不传则发送给所有接收者）
 
