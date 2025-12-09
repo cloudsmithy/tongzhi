@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: wechat-notification-backend
+    restart: unless-stopped
+    environment:
+      - SERVER_ADDRESS=:8080
+      - DATABASE_PATH=/app/data/notification.db
+      - SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
+      - OIDC_PROVIDER_URL=${OIDC_PROVIDER_URL}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OIDC_REDIRECT_URL=${OIDC_REDIRECT_URL}
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: wechat-notification-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  backend_data:
+
+networks:
+  app-network:
+    driver: bridge
