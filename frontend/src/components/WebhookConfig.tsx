@@ -15,6 +15,7 @@ export function WebhookConfig({ token, templates, onTokenChange, onSuccess, onEr
   
   // 获取示例用的 templateKey
   const exampleTemplateKey = templates.length > 0 ? templates[0].key : '订单通知';
+  const webhookUrl = `${window.location.origin}/api/webhook/send`;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -42,8 +43,8 @@ export function WebhookConfig({ token, templates, onTokenChange, onSuccess, onEr
         <div className="form-group">
           <label className="form-label">Webhook URL</label>
           <div className="input-with-button">
-            <input type="text" className="form-input" value="http://localhost:8080/webhook/send" readOnly />
-            <button type="button" className="btn btn-secondary" onClick={() => copyToClipboard('http://localhost:8080/webhook/send')}>复制</button>
+            <input type="text" className="form-input" value={webhookUrl} readOnly />
+            <button type="button" className="btn btn-secondary" onClick={() => copyToClipboard(webhookUrl)}>复制</button>
           </div>
         </div>
         <div className="form-group">
@@ -74,7 +75,7 @@ export function WebhookConfig({ token, templates, onTokenChange, onSuccess, onEr
 }`}
           />
           <p style={{ marginTop: '15px' }}><strong>curl 示例：</strong></p>
-          <pre>{`curl -X POST http://localhost:8080/webhook/send \\
+          <pre>{`curl -X POST ${webhookUrl} \\
   -H "Authorization: Bearer ${token || '<your-token>'}" \\
   -H "Content-Type: application/json" \\
   -d '{

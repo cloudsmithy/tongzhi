@@ -83,7 +83,7 @@ func main() {
 
 	// Public webhook endpoint (uses its own token auth + rate limiting)
 	webhookLimiter := middleware.NewRateLimiter(10, time.Second, 20) // 10 req/s, burst 20
-	r.POST("/webhook/send", middleware.RateLimitMiddleware(webhookLimiter), webhookHandler.Send)
+	r.POST("/api/webhook/send", middleware.RateLimitMiddleware(webhookLimiter), webhookHandler.Send)
 
 	log.Printf("Server starting on %s (dev mode: %v)", cfg.ServerAddress, cfg.DevMode)
 	if err := r.Run(cfg.ServerAddress); err != nil {
