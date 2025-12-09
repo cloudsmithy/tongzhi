@@ -142,14 +142,20 @@ func (h *AuthHandler) Callback(c *gin.Context) {
 		return
 	}
 
-	// Get user info
-	userInfo, err := h.oidcProvider.GetUserInfo(tokenResp.AccessToken)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get user information",
-			"code":  "USERINFO_FAILED",
-		})
-		return
+	// Get user info - try ID token first, then userinfo endpoint
+	var userInfo *services.UserInfo
+	if tokenResp.IDToken != "" {
+		userInfo, err = h.oidcProvider.GetUserInfoFromIDToken(tokenResp.IDToken)
+	}
+	if userInfo == nil || err != nil {
+		userInfo, err = h.oidcProvider.GetUserInfo(tokenResp.AccessToken)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to get user information",
+				"code":  "USERINFO_FAILED",
+			})
+			return
+		}
 	}
 
 	// Create session

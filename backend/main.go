@@ -59,6 +59,11 @@ func main() {
 	r.GET("/auth/callback", authHandler.Callback)
 	r.POST("/auth/logout", authHandler.Logout)
 
+	// Redirect root to frontend (for development)
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(302, "http://localhost:5173")
+	})
+
 	// Protected API routes
 	api := r.Group("/api")
 	if !cfg.DevMode {

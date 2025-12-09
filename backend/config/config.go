@@ -1,9 +1,39 @@
 package config
 
 import (
+	"bufio"
 	"os"
 	"strings"
 )
+
+// loadEnvFile loads environment variables from a .env file
+func loadEnvFile(filename string) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return // .env file is optional
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		// Skip empty lines and comments
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		// Parse KEY=VALUE
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		// Only set if not already set (env vars take precedence)
+		if os.Getenv(key) == "" {
+			os.Setenv(key, value)
+		}
+	}
+}
 
 // Config holds all configuration for the application
 type Config struct {
@@ -33,6 +63,9 @@ type WeChatConfig struct {
 
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
+	// Load .env file if exists
+	loadEnvFile(".env")
+
 	oidcProviderURL := getEnv("OIDC_PROVIDER_URL", "")
 	devMode := getEnv("DEV_MODE", "") == "true" || oidcProviderURL == ""
 

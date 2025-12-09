@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -77,7 +78,7 @@ func (p *OIDCProvider) GetAuthorizationURL(state string) (string, error) {
 	params.Set("client_id", p.config.ClientID)
 	params.Set("redirect_uri", p.config.RedirectURL)
 	params.Set("response_type", "code")
-	params.Set("scope", "openid email profile")
+	params.Set("scope", "openid")
 	params.Set("state", state)
 
 	return fmt.Sprintf("%s?%s", doc.AuthorizationEndpoint, params.Encode()), nil
@@ -136,6 +137,48 @@ func (p *OIDCProvider) ExchangeCode(code string) (*OIDCTokenResponse, error) {
 	}
 
 	return &tokenResp, nil
+}
+
+// GetUserInfoFromIDToken extracts user info from ID token (JWT)
+func (p *OIDCProvider) GetUserInfoFromIDToken(idToken string) (*UserInfo, error) {
+	// Split JWT: header.payload.signature
+	parts := strings.Split(idToken, ".")
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid ID token format")
+	}
+
+	// Decode payload (base64url)
+	payload := parts[1]
+	// Add padding if needed
+	switch len(payload) % 4 {
+	case 2:
+		payload += "=="
+	case 3:
+		payload += "="
+	}
+	decoded, err := base64.URLEncoding.DecodeString(payload)
+	if err != nil {
+		// Try standard encoding
+		decoded, err = base64.StdEncoding.DecodeString(payload)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode ID token payload: %w", err)
+		}
+	}
+
+	var claims struct {
+		Sub   string `json:"sub"`
+		Email string `json:"email"`
+		Name  string `json:"name"`
+	}
+	if err := json.Unmarshal(decoded, &claims); err != nil {
+		return nil, fmt.Errorf("failed to parse ID token claims: %w", err)
+	}
+
+	return &UserInfo{
+		Sub:   claims.Sub,
+		Email: claims.Email,
+		Name:  claims.Name,
+	}, nil
 }
 
 // GetUserInfo retrieves user information using an access token
